@@ -1,0 +1,53 @@
+# If the customer has a desire for custom roles to land at a default app,
+# this would be done in the user-prefs.conf configuration file in
+# $SPLUNK_HOME/etc/apps/user-prefs/local. The syntax would be:
+# (global default)
+# [general_default]
+# default_namespace = <directory_name_of_app>
+# E.g.
+# default_namespace = splunk_app_windows_infrastructure
+#
+# (role default)
+# [role_<role>]
+# default_namespace = search
+
+[role_org_custom]
+# These two limits are across *all members of the role*, 0 = unlimited
+cumulativeRTSrchJobsQuota = 0
+cumulativeSrchJobsQuota = 0
+# Maximum number of historical (non-real-time) searches for the user
+srchJobsQuota = 3
+importRoles = user
+# These users are restricted to these two indexes
+srchIndexesAllowed = main;customer
+# If the user does not provide "index=" in their search string, look here:
+srchIndexesDefault = customer
+# These users can only see back one week
+srchTimeWin = 7days
+
+[role_org_network]
+cumulativeRTSrchJobsQuota = 0
+cumulativeSrchJobsQuota = 0
+# Importing the "power" role gives real time search capability.
+importRoles = power;user
+# Number of concurrent real-time searches (see also the real time search
+# capability--this role, drawing from stock 'user' has no RT search capability)
+rtJobsQuota = 1
+# These users can search more concurrently, maybe because of a busy dashboard.
+srchJobsQuota = 5
+# These users are allowed to search any index that is not an internal one
+# (such as _audit or _internal)
+srchIndexesAllowed = *
+srchIndexesDefault = main;network;firewall
+srchTimeWin = 30days
+
+[role_org_admin]
+cumulativeRTSrchJobsQuota = 0
+cumulativeSrchJobsQuota = 0
+# This is like inheriting from the 'admin' role
+admin_all_objects = enabled
+# These users can search anything, but will probably need to use "index="
+# in their search to find what they're looking for.
+srchIndexesAllowed = *;_*
+srchIndexesDefault = main
+srchTimeWin = 0

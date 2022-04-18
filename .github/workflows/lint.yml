@@ -1,0 +1,51 @@
+name: Lint
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+          cache: 'pip'
+      - run: python -m ensurepip --upgrade
+      - run: pip install -r requirements.txt
+      - name: Lint config
+        id: lc
+        continue-on-error: true
+        env:
+          SPLUNK_PASS: ${{ secrets.SPLUNK_PASS }}
+        run: |
+          python lint.py
+          body=$(cat output.txt)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+          echo "::set-output name=body::$body"
+      - name: Find Comment
+        id: fc
+        uses: peter-evans/find-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Lint results
+      - name: Write comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ## Lint results
+            ${{ steps.lc.outputs.body }}
+      - name: check for lint failure
+        if: steps.lc.outputs.status == 'failure'
+        run: |
+          exit 1
+
+          
+          

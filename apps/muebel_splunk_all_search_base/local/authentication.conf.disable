@@ -1,0 +1,62 @@
+# See also:
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authenticationconf
+
+[authentication]
+authType = LDAP
+authSettings = org_ldap_auth
+
+[org_ldap_auth]
+# Dictates whether or not SSL is used for LDAP settings.
+# This can commonly be guessed by the TCP port used for LDAP communications:
+# 389 = no SSL
+# 636 = SSL
+SSLEnabled = 1
+# This is the DN of the "user" account with which to bind to the directory.
+# It is commonly supplied by the LDAP admins. For notational shorthand, 
+# there are abbreviations in the DN (Distinguished Name) of this user, here
+# are a few:
+# ou = Organizational Unit (e.g. department)
+# o = Organization
+# dc = Domain Component (e.g. "com" in "company.com")
+# uid = User ID
+# cn = Common Name
+bindDN = cn=splunk_ldap,ou=accounts,ou=groups,dc=company,dc=com
+# Where in the tree should Splunk start looking for groups? Child objects below
+# this will be searched, so this should be the "root" or "greatest common
+# component" of the LDAP path to the collection of groups to be mapped to
+# Splunk. If there are multiple paths (as large organizations are likely
+# to have), then multiple paths, separated by semicolons, can be used.
+groupBaseDN = ou=groups,dc=company,dc=com
+# A group uses what attribute to declare a user as a member...?
+groupMemberAttribute = member
+# What attribute of the group is used to identify it later for role mappings?
+groupNameAttribute = cn
+# The hostname of the LDAP server.
+host = ldap.company.com
+port = 636
+# This is an attribute on a user to find their "real name" for the human-
+# readable display in the LDAP auth settings page.
+realNameAttribute = cn
+# Where in the LDAP tree are users defined?
+userBaseDN = ou=accounts,ou=groups,dc=company,dc=com
+# The value of this attribute is searched for what the user types in as
+# their user name for authentication purposes.
+userNameAttribute = uid
+
+# This maps groups to roles in Splunk. See also authorize.conf.
+# In order to log in, a user must
+#   exist in the directory
+#   provide the correct password
+#   be a member of a group that has been mapped to a Splunk role
+# This is one way to manage users by sharing the same LDAP configuration
+# across multiple search heads, but limiting the roleMap entries only to
+# the LDAP groups which are permitted to log in.
+# If multiple LDAP groups exist on the RHS of the mapping, they should
+# be separated by semicolons. NOTE: Attempting to map multiple groups to 
+# the same role by providing multiple key=value pairs with the same Splunk
+# role listed as the key will NOT work.
+[roleMap_org_ldap_auth]
+# Remember this is contained somewhere under groupBaseDN
+admin = Splunk_Admins
+user = Splunk_Users
+network = Network_Admins

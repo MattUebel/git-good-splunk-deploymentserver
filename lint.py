@@ -21,7 +21,7 @@ for file in config_files:
             ds = config.get(section, "targetUri")
             if ds != VALID_DS:
                 ERROR_MESSAGES.append(
-                    f"{file}:{section}: The targetUri of `{ds}` is not the valid Deployment Server : {VALID_DS}"
+                    f"`{file}`:`{section}`: The targetUri of `{ds}` is not the valid Deployment Server : `{VALID_DS}`"
                 )
 
 with open(OUTPUT_FILE, "w") as f:

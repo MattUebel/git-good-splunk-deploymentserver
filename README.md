@@ -6,7 +6,5 @@ This repo contains some example code for configuring and validating your deploym
 
 ## Prerequisites
 
-Setup your deployment server as a self-hosted runner associated with your adaptiation of the workflows and scripts in this repo.
-
-Your repo will need to have branch protection rules in place to take advantage of the linting workflows.
+Reference the main repo for more details https://github.com/MattUebel/git-good-with-splunk/tree/main/docs
 
